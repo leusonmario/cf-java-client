@@ -1,31 +1,25 @@
----
+
+sudo: required
 language: java
-script: cd cloudfoundry-client-lib && mvn -P integration-test clean install -Dccng.target=$TARGET
-  -Dccng.email=$EMAIL -Dccng.passwd=$PASSWD -Dccng.org=$ORG -Dccng.space=$SPACE -Dsurefire.useFile=false
-env:
-  global:
-  - secure: ! 'CEnlffjCZBVHaO9yXS6Q1cWdorIovujdzAeRuAXBD9MFGnqWxJkACRyfTC2o
 
-      kTamcocisznrI1IPcQajLvNBQhVjgut/vV1Dpneuy1/xySmhNG3bF+CV7GQf
+jdk:
+  - oraclejdk8
 
-      /3FrS4yd7Uylpv9SMd3VM+EClDGQ3mR7OT4216+Q+vyE5Lh09WA='
-  - secure: ! 'nzRzsqc+3dN9ts10T9SFveaW/hWmzByi81QyMn5LhbmGjU95D3fibgyd/aU3
+script:
+  - mvn clean cobertura:cobertura -Dtest=CloudFoundryClientTest#getApplicationInstances -DfailIfNoTests=false
 
-      OQPCTR2mTh/Ri7ROb5Bne+6elqPCu99CFoML3QWOSm8cHt2bbwbbbtzDtTC1
+before_deploy:
+- tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/cf-java-client/target/site/cobertura
 
-      ZEIyXjUrz5wcvrXWMbYTbxEPVDrHUvK0vjE9gjl2pTK87fd5v+8='
-  - secure: ! 'QDCvbb1T+DwyoLhoK1omwhRXBaHz/iYMCcI/miKlExwjCqHsPmnoy4HGe0vq
+deploy:
+  provider: releases
+  api_key:
+    secure: "e5XZUk4OOeyrCX+OEZBdQsYdW12bofRjNfIqpXF3FvvZ0oKKM7k4pLiixokLkZxEcnp+Y7Lb40ryZgRDN/3FOQFa8eiWm4E9UBrO1AXeytn4aQviav15CNfRCJ9yNtcUIV0+u7P0lkr2afMEz4rBC2ZiTFisFqNBOFQUD71D2bqgXcyuvjt82JFFSjTG8JASSA6K/dk2zUzpZZQ9Eox1AoFY2wRjxgXb2POf71c93t/sfYRBfH2oa3YE0zd2qrGRJ5L252Ya1whrmESSCvwbiHYuF7qYCXi4/VTzXXKDF/zlnWmSGhM3yOzaDC9YHDP5dIdYuOp3pWb+FvX81UfUeP/M2EvyP+UwPeCFvRYw/1wtSdqW+OyUF7YiMM2MkGfQOH190ZNU9Twy599TABCPLqjKvwkYwmCZfu2JFRlN7ifJFJvoKrlXORM8KDqLcNkWIyX9nvPt6tCFy+EhKrzvM9/qluLVafGlmX9Mh0IYmO6EQiPkQIXec4SxxhBUYXfNFeVN1Zfx4LzwsTh0XIHRQKc06hf89OGNzGHKyCxk86hHfXooh1pUDbtyuwTm9eiMpKxQOGBjsWlWDap+mSorYEbakfPAPHbthGuQvGAMFqLwvavYblm6aL23o6Ja+y9SvRpfHruQytT4AtlCsfcdNTb0uU5ue99Nj+wtev5cwsI="
 
-      Ej+Nm6WraYPkDC7GGmt3i7tNOgMFssxTm0qh62zzIlf1oQC/FQuPK4rQL+D/
 
-      BOZJB7rFBcko9ONKNTubUfomk3NLuf65/S+GbsSWshXohon4JWU='
-  - secure: ! 'gGknileQIFfu2598k93xb/t4EvMvauthat+jVZAqztbnxOopEBgjoSixQG7R
-
-      DAHs6YbbzoJZYuFH0XyyxtNwJ/kYbN3pBn43bIoK0NNZw7cPwew8zkjbBDcw
-
-      Hqg8Qt88FYbZWMepMZre0eN8tMJyjO9YqlpnLX0YFVRJD28wga0='
-  - secure: ! 'oEsQwUVp6SCxI0jpPYpYH7cRW/M8GtOFLEuU5ZKlgXANeU8t1AoKeFHIMKww
-
-      5vLs5J+AqNYyGODeSMZ7EwgmGRVqzHckQUKfMNzkwyFN4Uj0nmRwGXnzSKk6
-
-      OgG+XFxHZ/RKlCUSwKYwxdMbTon6MlTBCjxDmQIPk/HfoRUVGOc='
+  file: coverage-result.tar.gz
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    tags: true
